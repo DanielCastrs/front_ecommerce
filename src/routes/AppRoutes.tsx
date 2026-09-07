@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-
+import { Login } from '../pages/Login/Login';
 import { Home } from '../pages/Home/Home';
+import { Products } from '../pages/Products/Products';
+import { ProductDetails } from '../pages/ProductDetails/ProductDetails';
 import { MainLayout } from '../layouts/MainLayout';
 
 export function AppRoutes() {
@@ -14,12 +16,17 @@ export function AppRoutes() {
 
           <Route
             path="/produtos"
-            element={<h1>Produtos</h1>}
+            element={<Products />}
+          />
+
+          <Route
+            path="/produtos/:id"
+            element={<ProductDetails />}
           />
 
           <Route
             path="/login"
-            element={<h1>Login</h1>}
+            element={<Login />}
           />
 
           <Route

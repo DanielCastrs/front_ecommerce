@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 interface ProductCardProps {
   id: string;
   name: string;
@@ -7,6 +9,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({
+  id,
   name,
   description,
   price,
@@ -35,12 +38,12 @@ export function ProductCard({
           Estoque: {stock}
         </p>
 
-        <button
-          type="button"
-          className="mt-4 w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-700"
-        >
-          Ver produto
-        </button>
+        <Link
+            to={`/produtos/${id}`}
+            className="mt-4 block w-full rounded-lg bg-blue-600 px-4 py-3 text-center font-semibold text-white transition hover:bg-blue-700"
+>
+            Ver produto
+        </Link>
       </div>
     </article>
   );
