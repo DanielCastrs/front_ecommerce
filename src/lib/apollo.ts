@@ -1,26 +1,19 @@
-import {
-  ApolloClient,
-  InMemoryCache,
-  HttpLink,
-} from '@apollo/client';
+import { ApolloClient, InMemoryCache, HttpLink } from "@apollo/client";
 
-import {
-  SetContextLink,
-} from '@apollo/client/link/context';
+import { SetContextLink } from "@apollo/client/link/context";
 
 const httpLink = new HttpLink({
-  uri: 'http://localhost:3000/graphql',
+  uri: "http://localhost:3000/graphql",
 });
 
 const authLink = new SetContextLink((_, { headers }) => {
-  const token = localStorage.getItem('accessToken');
+  const token = localStorage.getItem("accessToken");
 
+  console.log("Apollo - token encontrado:", token ? "SIM" : "NÃO");
   return {
     headers: {
       ...headers,
-      authorization: token
-        ? `Bearer ${token}`
-        : '',
+      Authorization: token ? `Bearer ${token}` : "",
     },
   };
 });
