@@ -1,7 +1,7 @@
-import { useQuery } from '@apollo/client/react';
-import { Link, useParams } from 'react-router-dom';
-
-import { GET_PRODUCT } from '../../graphql/queries/product';
+import { useQuery, useMutation } from "@apollo/client/react";
+import { Link, useParams } from "react-router-dom";
+import { ADD_TO_CART } from "../../graphql/mutations/cart";
+import { GET_PRODUCT } from "../../graphql/queries/product";
 
 interface Product {
   id: string;
@@ -15,6 +15,31 @@ interface Product {
   };
 }
 
+interface Cart {
+  id: string;
+  total: number;
+  items: {
+    quantity: number;
+    subtotal: number;
+    product: {
+      id: string;
+      name: string;
+      price: number;
+    };
+  }[];
+}
+
+interface AddToCartData {
+  addToCart: Cart;
+}
+
+interface AddToCartVariables {
+  input: {
+    productId: string;
+    quantity: number;
+  };
+}
+
 interface ProductData {
   product: Product;
 }
@@ -22,21 +47,21 @@ interface ProductData {
 export function ProductDetails() {
   const { id } = useParams();
 
-  const { data, loading, error } = useQuery<ProductData>(
-    GET_PRODUCT,
-    {
-      variables: {
-        id,
-      },
+  const { data, loading, error } = useQuery<ProductData>(GET_PRODUCT, {
+    variables: {
+      id,
     },
-  );
+  });
+
+  const [addToCart, { loading: addingToCart }] = useMutation<
+    AddToCartData,
+    AddToCartVariables
+  >(ADD_TO_CART);
 
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="text-lg text-gray-600">
-          Carregando produto...
-        </p>
+        <p className="text-lg text-gray-600">Carregando produto...</p>
       </div>
     );
   }
@@ -70,27 +95,41 @@ export function ProductDetails() {
 
   const product = data.product;
 
+  async function handleAddToCart() {
+    if (!product) {
+      return;
+    }
+
+    try {
+      const response = await addToCart({
+        variables: {
+          input: {
+            productId: product.id,
+            quantity: 1,
+          },
+        },
+      });
+
+      console.log("Produto adicionado ao carrinho:", response.data?.addToCart);
+    } catch (error) {
+      console.error("Erro ao adicionar produto ao carrinho:", error);
+    }
+  }
+
   return (
     <main className="min-h-screen bg-gray-100 px-6 py-10">
       <div className="mx-auto max-w-5xl">
-
-        <Link
-          to="/produtos"
-          className="text-blue-600 hover:underline"
-        >
+        <Link to="/produtos" className="text-blue-600 hover:underline">
           ← Voltar para produtos
         </Link>
 
         <section className="mt-6 grid gap-8 rounded-xl bg-white p-8 shadow-md md:grid-cols-2">
-
           <div className="flex min-h-96 items-center justify-center rounded-xl bg-gray-100">
             <span className="text-8xl">📱</span>
           </div>
 
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              {product.name}
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
 
             {product.category && (
               <p className="mt-2 text-sm text-gray-500">
@@ -98,12 +137,10 @@ export function ProductDetails() {
               </p>
             )}
 
-            <p className="mt-6 text-gray-600">
-              {product.description}
-            </p>
+            <p className="mt-6 text-gray-600">{product.description}</p>
 
             <p className="mt-8 text-4xl font-bold text-blue-600">
-              R$ {product.price.toFixed(2).replace('.', ',')}
+              R$ {product.price.toFixed(2).replace(".", ",")}
             </p>
 
             <p className="mt-4 text-gray-600">
@@ -112,12 +149,13 @@ export function ProductDetails() {
 
             <button
               type="button"
-              className="mt-8 w-full rounded-lg bg-blue-600 px-6 py-4 font-semibold text-white transition hover:bg-blue-700"
+              onClick={handleAddToCart}
+              disabled={addingToCart}
+              className="mt-8 w-full rounded-lg bg-blue-600 px-6 py-4 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Adicionar ao carrinho
+              {addingToCart ? "Adicionando..." : "Adicionar ao carrinho"}
             </button>
           </div>
-
         </section>
       </div>
     </main>

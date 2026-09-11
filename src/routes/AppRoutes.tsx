@@ -5,6 +5,7 @@ import { Products } from "../pages/Products/Products";
 import { ProductDetails } from "../pages/ProductDetails/ProductDetails";
 import { MainLayout } from "../layouts/MainLayout";
 import { Profile } from "../pages/Profile/Profile";
+import { Cart } from "../pages/Cart/Cart";
 
 export function AppRoutes() {
   return (
@@ -12,14 +13,10 @@ export function AppRoutes() {
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
-
           <Route path="/produtos" element={<Products />} />
-
           <Route path="/produtos/:id" element={<ProductDetails />} />
-
           <Route path="/login" element={<Login />} />
-
-          <Route path="/carrinho" element={<h1>Carrinho</h1>} />
+          <Route path="/carrinho" element={<Cart />} />{" "}
           <Route path="/perfil" element={<Profile />} />
         </Route>
       </Routes>
