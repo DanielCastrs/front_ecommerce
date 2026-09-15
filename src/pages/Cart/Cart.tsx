@@ -1,7 +1,12 @@
 import { useQuery, useMutation } from "@apollo/client/react";
 import { Link } from "react-router-dom";
-import { UPDATE_CART_ITEM } from "../../graphql/mutations/cart";
+import {
+  UPDATE_CART_ITEM,
+  REMOVE_FROM_CART,
+  CLEAR_CART,
+} from "../../graphql/mutations/cart";
 import { GET_MY_CART } from "../../graphql/queries/cart";
+import { CREATE_ORDER } from "../../graphql/mutations/order";
 
 interface CartItem {
   quantity: number;
@@ -34,6 +39,36 @@ interface UpdateCartItemVariables {
   };
 }
 
+interface RemoveFromCartData {
+  removeFromCart: Cart;
+}
+
+interface RemoveFromCartVariables {
+  productId: string;
+}
+
+interface ClearCartData {
+  clearCart: Cart;
+}
+
+interface OrderItem {
+  name: string;
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
+}
+
+interface Order {
+  id: string;
+  status: string;
+  total: number;
+  items: OrderItem[];
+}
+
+interface CreateOrderData {
+  createOrder: Order;
+}
+
 export function Cart() {
   const { data, loading, error } = useQuery<CartData>(GET_MY_CART);
 
@@ -42,6 +77,18 @@ export function Cart() {
     UpdateCartItemVariables
   >(UPDATE_CART_ITEM);
 
+  const [removeFromCart, { loading: removingFromCart }] = useMutation<
+    RemoveFromCartData,
+    RemoveFromCartVariables
+  >(REMOVE_FROM_CART);
+
+  const [clearCart, { loading: clearingCart }] =
+    useMutation<ClearCartData>(CLEAR_CART);
+
+  const [createOrder, { loading: creatingOrder }] =
+    useMutation<CreateOrderData>(CREATE_ORDER);
+
+  //quantidade de produtos
   async function handleUpdateQuantity(productId: string, quantity: number) {
     if (quantity < 1) return;
 
@@ -56,6 +103,38 @@ export function Cart() {
       });
     } catch (error) {
       console.error("Erro ao atualizar quantidade:", error);
+    }
+  }
+
+  //remover card
+  async function handleRemoveFromCart(productId: string) {
+    try {
+      await removeFromCart({
+        variables: {
+          productId,
+        },
+      });
+    } catch (error) {
+      console.error("Erro ao remover produto:", error);
+    }
+  }
+
+  //limpar carrinho
+  async function handleClearCart() {
+    try {
+      await clearCart();
+    } catch (error) {
+      console.error("Erro ao limpar carrinho:", error);
+    }
+  }
+
+  async function handleCreateOrder() {
+    try {
+      const response = await createOrder();
+
+      console.log("Pedido criado com sucesso:", response.data?.createOrder);
+    } catch (error) {
+      console.error("Erro ao criar pedido:", error);
     }
   }
 
@@ -150,6 +229,14 @@ export function Cart() {
                       +
                     </button>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveFromCart(item.product.id)}
+                    disabled={removingFromCart}
+                    className="mt-4 text-sm font-semibold text-red-600 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {removingFromCart ? "Removendo..." : "Remover produto"}
+                  </button>
                 </div>
 
                 <div className="text-right">
@@ -178,9 +265,20 @@ export function Cart() {
 
           <button
             type="button"
-            className="mt-6 w-full rounded-lg bg-green-600 px-6 py-3 font-semibold text-white hover:bg-green-700"
+            onClick={handleClearCart}
+            disabled={clearingCart}
+            className="mt-6 w-full rounded-lg border border-red-500 px-6 py-3 font-semibold text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Finalizar pedido
+            {clearingCart ? "Limpando..." : "Limpar carrinho"}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleCreateOrder}
+            disabled={creatingOrder}
+            className="mt-3 w-full rounded-lg bg-green-600 px-6 py-3 font-semibold text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {creatingOrder ? "Criando pedido..." : "Finalizar pedido"}
           </button>
         </aside>
       </div>

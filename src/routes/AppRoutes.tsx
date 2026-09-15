@@ -1,11 +1,16 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Login } from "../pages/Login/Login";
+
 import { Home } from "../pages/Home/Home";
 import { Products } from "../pages/Products/Products";
 import { ProductDetails } from "../pages/ProductDetails/ProductDetails";
-import { MainLayout } from "../layouts/MainLayout";
+import { Login } from "../pages/Login/Login";
 import { Profile } from "../pages/Profile/Profile";
 import { Cart } from "../pages/Cart/Cart";
+import { Orders } from "../pages/Orders/Orders";
+import { Payment } from "../pages/Payment/Payment";
+
+import { MainLayout } from "../layouts/MainLayout";
+import { ProtectedRoute } from "./ProtectedRoute";
 
 export function AppRoutes() {
   return (
@@ -13,11 +18,22 @@ export function AppRoutes() {
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
+
           <Route path="/produtos" element={<Products />} />
+
           <Route path="/produtos/:id" element={<ProductDetails />} />
+
           <Route path="/login" element={<Login />} />
-          <Route path="/carrinho" element={<Cart />} />{" "}
-          <Route path="/perfil" element={<Profile />} />
+
+          <Route element={<ProtectedRoute />}>
+            <Route path="/perfil" element={<Profile />} />
+
+            <Route path="/carrinho" element={<Cart />} />
+
+            <Route path="/pedidos" element={<Orders />} />
+
+            <Route path="/pagamento/:orderId" element={<Payment />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>

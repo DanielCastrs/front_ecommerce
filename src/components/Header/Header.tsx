@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client/react";
 import { Link, useNavigate } from "react-router-dom";
-
+import { apolloClient } from "../../lib/apollo";
 import { GET_ME } from "../../graphql/queries/me";
 
 interface User {
@@ -19,13 +19,13 @@ export function Header() {
 
   const token = localStorage.getItem("accessToken");
 
-  const { data } = useQuery<MeData>(GET_ME, {
+  const { data, loading } = useQuery<MeData>(GET_ME, {
     skip: !token,
   });
 
-  function handleLogout() {
+  async function handleLogout() {
     localStorage.removeItem("accessToken");
-
+    await apolloClient.clearStore();
     navigate("/login");
   }
 
@@ -48,13 +48,22 @@ export function Header() {
             Produtos
           </Link>
 
-          {data?.me ? (
+          {loading ? (
+            <span className="text-sm text-gray-500">Carregando...</span>
+          ) : data?.me ? (
             <>
               <Link
                 to="/perfil"
                 className="font-semibold text-gray-700 transition hover:text-blue-600"
               >
                 👤 {data.me.name}
+              </Link>
+
+              <Link
+                to="/pedidos"
+                className="text-gray-700 transition hover:text-blue-600"
+              >
+                📦 Meus pedidos
               </Link>
 
               <Link
@@ -79,13 +88,6 @@ export function Header() {
                 className="text-gray-700 transition hover:text-blue-600"
               >
                 Login
-              </Link>
-
-              <Link
-                to="/carrinho"
-                className="text-gray-700 transition hover:text-blue-600"
-              >
-                🛒 Carrinho
               </Link>
             </>
           )}

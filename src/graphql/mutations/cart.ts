@@ -35,3 +35,33 @@ export const UPDATE_CART_ITEM = gql`
     }
   }
 `;
+
+export const REMOVE_FROM_CART = gql`
+  mutation RemoveFromCart($productId: ID!) {
+    removeFromCart(productId: $productId) {
+      id
+      total
+      items {
+        quantity
+        subtotal
+        product {
+          id
+          name
+          price
+        }
+      }
+    }
+  }
+`;
+
+export const CLEAR_CART = gql`
+  mutation ClearCart {
+    clearCart {
+      id
+      total
+      items {
+        quantity
+      }
+    }
+  }
+`;
