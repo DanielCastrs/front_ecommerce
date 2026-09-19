@@ -2,6 +2,9 @@ import { useQuery, useMutation } from "@apollo/client/react";
 import { Link } from "react-router-dom";
 import { GET_ORDERS } from "../../graphql/queries/order";
 import { CANCEL_ORDER } from "../../graphql/mutations/order";
+
+import { ErrorMessage, Loading } from "../../components/Feedback/ErrorMessage";
+
 interface OrderItem {
   name: string;
   quantity: number;
@@ -47,7 +50,7 @@ export function Orders() {
   if (loading) {
     return (
       <main className="mx-auto max-w-7xl px-6 py-10">
-        <p className="text-gray-600">Carregando pedidos...</p>
+        <Loading message="Carregando pedidos..." />
       </main>
     );
   }
@@ -55,9 +58,7 @@ export function Orders() {
   if (error) {
     return (
       <main className="mx-auto max-w-7xl px-6 py-10">
-        <p className="text-red-600">Erro ao carregar os pedidos.</p>
-
-        <p className="mt-2 text-sm text-gray-500">{error.message}</p>
+        <ErrorMessage message="Não foi possível carregar seus pedidos." />
       </main>
     );
   }

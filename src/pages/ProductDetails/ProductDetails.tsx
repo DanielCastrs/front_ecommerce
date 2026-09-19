@@ -2,6 +2,7 @@ import { useQuery, useMutation } from "@apollo/client/react";
 import { Link, useParams } from "react-router-dom";
 import { ADD_TO_CART } from "../../graphql/mutations/cart";
 import { GET_PRODUCT } from "../../graphql/queries/product";
+import { ErrorMessage, Loading } from "../../components/Feedback/ErrorMessage";
 
 interface Product {
   id: string;
@@ -60,19 +61,21 @@ export function ProductDetails() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-lg text-gray-600">Carregando produto...</p>
-      </div>
+      <main className="min-h-screen bg-gray-100 px-6 py-10">
+        <div className="mx-auto max-w-5xl">
+          <Loading message="Carregando produto..." />
+        </div>
+      </main>
     );
   }
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-red-600">
-          Erro ao carregar produto: {error.message}
-        </p>
-      </div>
+      <main className="min-h-screen bg-gray-100 px-6 py-10">
+        <div className="mx-auto max-w-5xl">
+          <ErrorMessage message="Não foi possível carregar o produto." />
+        </div>
+      </main>
     );
   }
 
