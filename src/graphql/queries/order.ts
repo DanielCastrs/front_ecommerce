@@ -15,3 +15,19 @@ export const GET_ORDERS = gql`
     }
   }
 `;
+
+export const GET_ORDER = gql`
+  query Order($id: ID!) {
+    order(id: $id) {
+      id
+      status
+      total
+      createdAt
+      items {
+        name
+        quantity
+        subtotal
+      }
+    }
+  }
+`;

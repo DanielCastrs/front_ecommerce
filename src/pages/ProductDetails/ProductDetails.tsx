@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { ADD_TO_CART } from "../../graphql/mutations/cart";
 import { GET_PRODUCT } from "../../graphql/queries/product";
 import { ErrorMessage, Loading } from "../../components/Feedback/ErrorMessage";
+import { toast } from "react-toastify";
 
 interface Product {
   id: string;
@@ -104,7 +105,7 @@ export function ProductDetails() {
     }
 
     try {
-      const response = await addToCart({
+      await addToCart({
         variables: {
           input: {
             productId: product.id,
@@ -113,9 +114,11 @@ export function ProductDetails() {
         },
       });
 
-      console.log("Produto adicionado ao carrinho:", response.data?.addToCart);
+      toast.success("Produto adicionado ao carrinho!");
     } catch (error) {
       console.error("Erro ao adicionar produto ao carrinho:", error);
+
+      toast.error("Não foi possível adicionar o produto ao carrinho.");
     }
   }
 

@@ -1,5 +1,5 @@
 import { useQuery, useMutation } from "@apollo/client/react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   UPDATE_CART_ITEM,
   REMOVE_FROM_CART,
@@ -7,6 +7,7 @@ import {
 } from "../../graphql/mutations/cart";
 import { GET_MY_CART } from "../../graphql/queries/cart";
 import { CREATE_ORDER } from "../../graphql/mutations/order";
+import { toast } from "react-toastify";
 
 interface CartItem {
   quantity: number;
@@ -70,6 +71,8 @@ interface CreateOrderData {
 }
 
 export function Cart() {
+  const navigate = useNavigate();
+
   const { data, loading, error } = useQuery<CartData>(GET_MY_CART);
 
   const [updateCartItem, { loading: updatingCart }] = useMutation<
@@ -101,8 +104,11 @@ export function Cart() {
           },
         },
       });
+
+      toast.success("Quantidade atualizada!");
     } catch (error) {
       console.error("Erro ao atualizar quantidade:", error);
+      toast.error("Não foi possível atualizar a quantidade.");
     }
   }
 
@@ -114,8 +120,11 @@ export function Cart() {
           productId,
         },
       });
+
+      toast.success("Produto removido do carrinho!");
     } catch (error) {
       console.error("Erro ao remover produto:", error);
+      toast.error("Não foi possível remover o produto.");
     }
   }
 
@@ -123,8 +132,11 @@ export function Cart() {
   async function handleClearCart() {
     try {
       await clearCart();
+
+      toast.success("Carrinho limpo com sucesso!");
     } catch (error) {
       console.error("Erro ao limpar carrinho:", error);
+      toast.error("Não foi possível limpar o carrinho.");
     }
   }
 
@@ -132,9 +144,19 @@ export function Cart() {
     try {
       const response = await createOrder();
 
-      console.log("Pedido criado com sucesso:", response.data?.createOrder);
+      const order = response.data?.createOrder;
+
+      if (!order) {
+        toast.error("Não foi possível criar o pedido.");
+        return;
+      }
+
+      toast.success("Pedido criado com sucesso!");
+
+      navigate(`/pagamento/${order.id}`);
     } catch (error) {
       console.error("Erro ao criar pedido:", error);
+      toast.error("Não foi possível finalizar o pedido.");
     }
   }
 

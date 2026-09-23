@@ -1,8 +1,9 @@
 import { useMutation, useQuery } from "@apollo/client/react";
 import { Link, useParams } from "react-router-dom";
 import { useState } from "react";
+
 import { PAY_ORDER } from "../../graphql/mutations/payment";
-import { GET_ORDERS } from "../../graphql/queries/order";
+import { GET_ORDERS, GET_ORDER } from "../../graphql/queries/order";
 
 interface OrderItem {
   name: string;
@@ -16,10 +17,6 @@ interface Order {
   total: number;
   createdAt: string;
   items: OrderItem[];
-}
-
-interface OrdersData {
-  orders: Order[];
 }
 
 interface Payment {
@@ -44,7 +41,19 @@ interface PayOrderVariables {
 export function Payment() {
   const { orderId } = useParams();
 
-  const { data, loading: loadingOrders } = useQuery<OrdersData>(GET_ORDERS);
+  const [payment, setPayment] = useState<Payment | null>(null);
+  const [paymentError, setPaymentError] = useState("");
+
+  const {
+    data,
+    loading: loadingOrder,
+    error: orderError,
+  } = useQuery<{ order: Order }>(GET_ORDER, {
+    variables: {
+      id: orderId,
+    },
+    skip: !orderId,
+  });
 
   const [payOrder, { loading: paying }] = useMutation<
     PayOrderData,
@@ -53,9 +62,7 @@ export function Payment() {
     refetchQueries: [{ query: GET_ORDERS }],
   });
 
-  const order = data?.orders.find((item) => item.id === orderId);
-  const [payment, setPayment] = useState<Payment | null>(null);
-  const [paymentError, setPaymentError] = useState("");
+  const order = data?.order;
 
   async function handlePayment(method: "PIX" | "CREDIT_CARD" | "BOLETO") {
     if (!orderId) return;
@@ -86,7 +93,7 @@ export function Payment() {
     }
   }
 
-  if (loadingOrders) {
+  if (loadingOrder) {
     return (
       <main className="mx-auto max-w-5xl px-6 py-10">
         <p className="text-gray-600">Carregando pedido...</p>
@@ -94,22 +101,27 @@ export function Payment() {
     );
   }
 
-  if (!order) {
+  if (orderError || !order) {
     return (
       <main className="mx-auto max-w-5xl px-6 py-10">
         <h1 className="text-2xl font-bold text-gray-900">
           Pedido não encontrado
         </h1>
 
+        <p className="mt-2 text-gray-600">
+          Não foi possível carregar os dados deste pedido.
+        </p>
+
         <Link
           to="/pedidos"
-          className="mt-6 inline-block rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white"
+          className="mt-6 inline-block rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700"
         >
           Voltar para pedidos
         </Link>
       </main>
     );
   }
+
   if (payment) {
     return (
       <main className="mx-auto max-w-5xl px-6 py-10">
@@ -179,11 +191,13 @@ export function Payment() {
           R$ {order.total.toFixed(2).replace(".", ",")}
         </p>
       </div>
+
       {paymentError && (
         <div className="mt-6 rounded-lg bg-red-100 p-4 text-red-700">
           {paymentError}
         </div>
       )}
+
       <div className="mt-8 rounded-xl bg-white p-6 shadow-md">
         <h2 className="text-xl font-bold text-gray-900">
           Escolha a forma de pagamento
