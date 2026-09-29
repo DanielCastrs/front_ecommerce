@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
+import { OrderDetails } from "../pages/OrderDetails/OrderDetails";
 import { Home } from "../pages/Home/Home";
 import { Products } from "../pages/Products/Products";
 import { ProductDetails } from "../pages/ProductDetails/ProductDetails";
@@ -33,6 +33,8 @@ export function AppRoutes() {
             <Route path="/pedidos" element={<Orders />} />
 
             <Route path="/pagamento/:orderId" element={<Payment />} />
+
+            <Route path="/pedidos/:orderId" element={<OrderDetails />} />
           </Route>
         </Route>
       </Routes>

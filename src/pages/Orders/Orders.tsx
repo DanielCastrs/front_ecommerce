@@ -125,7 +125,12 @@ export function Orders() {
           <article key={order.id} className="rounded-xl bg-white p-6 shadow">
             <div className="flex flex-col justify-between gap-4 border-b pb-4 sm:flex-row">
               <div>
-                <h2 className="font-bold text-gray-900">Pedido #{order.id}</h2>
+                <Link
+                  to={`/pedidos/${order.id}`}
+                  className="font-bold text-gray-900 hover:text-blue-600 hover:underline"
+                >
+                  Pedido #{order.id}
+                </Link>
 
                 <p className="mt-1 text-sm text-gray-500">
                   Data: {new Date(order.createdAt).toLocaleString("pt-BR")}
