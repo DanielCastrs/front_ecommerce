@@ -117,6 +117,15 @@ export function Header() {
             <span className="text-sm text-gray-500">Carregando...</span>
           ) : data?.me ? (
             <>
+              {data.me.role === "ADMIN" && (
+                <Link
+                  to="/admin/produtos"
+                  className="text-gray-700 transition hover:text-blue-600"
+                >
+                  ⚙️ Admin
+                </Link>
+              )}
+
               <Link
                 to="/perfil"
                 className="font-semibold text-gray-700 transition hover:text-blue-600"
@@ -211,6 +220,16 @@ export function Header() {
             <span className="text-sm text-gray-500">Carregando...</span>
           ) : data?.me ? (
             <>
+              {data.me.role === "ADMIN" && (
+                <Link
+                  to="/admin/produtos"
+                  className="text-gray-700 transition hover:text-blue-600"
+                  onClick={closeMenu}
+                >
+                  ⚙️ Admin
+                </Link>
+              )}
+
               <Link
                 to="/perfil"
                 className="font-semibold text-gray-700 transition hover:text-blue-600"

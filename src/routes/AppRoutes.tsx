@@ -11,6 +11,8 @@ import { Payment } from "../pages/Payment/Payment";
 
 import { MainLayout } from "../layouts/MainLayout";
 import { ProtectedRoute } from "./ProtectedRoute";
+import { AdminRoute } from "./AdminRoute";
+import { AdminProducts } from "../pages/Admin/Products/AdminProducts";
 
 export function AppRoutes() {
   return (
@@ -35,6 +37,10 @@ export function AppRoutes() {
             <Route path="/pagamento/:orderId" element={<Payment />} />
 
             <Route path="/pedidos/:orderId" element={<OrderDetails />} />
+          </Route>
+
+          <Route element={<AdminRoute />}>
+            <Route path="/admin/produtos" element={<AdminProducts />} />
           </Route>
         </Route>
       </Routes>
